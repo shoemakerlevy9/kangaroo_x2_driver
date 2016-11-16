@@ -126,6 +126,8 @@ bool kangaroo::start( )
 	ROS_INFO( "Starting" );
 	if( !joint_traj_sub )
 		joint_traj_sub = nh.subscribe( "joint_trajectory", 1, &kangaroo::JointTrajCB, this );
+	if( !joint_traj_sub )
+		joint_traj_sub = nh.subscribe( "power_down", 1, &kangaroo::PowerDownCB, this );
 	if( !joint_state_pub)
 		joint_state_pub = nh.advertise<sensor_msgs::JointState>( "joint_state", 2);
 
@@ -193,8 +195,16 @@ void kangaroo::JointTrajCB(const trajectory_msgs::JointTrajectoryPtr &msg)
 
 	// lock the output_mutex
 	boost::mutex::scoped_lock output_lock(output_mutex);
-	set_channel_speed(channel_1_speed, 128, 'D');
-	set_channel_speed(channel_2_speed, 128, 'T');
+	set_channel_speed(channel_1_speed, 128, ch1_joint_name);
+	set_channel_speed(channel_2_speed, 128, ch2_joint_name);
+}
+
+void kangaroo::PowerDownCB(const std_msgs::BoolPtr &msg)
+{
+	if (msg.data)
+	{
+		send_power_down_signals( 128)
+	}
 }
 
 bool kangaroo::send_start_signals(unsigned char address)
