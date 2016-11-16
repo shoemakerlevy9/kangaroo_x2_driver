@@ -161,6 +161,13 @@ size_t write_kangaroo_get_command(unsigned char address, char channel, char para
 	return write_kangaroo_command(address, 35, data, length, buffer);
 }
 
+size_t power_down_all_command(unsigned char address, char channel, unsigned char* buffer)
+{
+	unsigned char data[1];
+	data[0] = (unsigned char)channel;
+	return write_kangaroo_command(address, 1, data, length, buffer);
+}
+
 /*! Writes a Packet Serial command into a buffer.
 \param address The address of the Kangaroo. By default, this is 128.
 \param command The command number
