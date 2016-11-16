@@ -17,8 +17,8 @@
 
 kangaroo::kangaroo( ros::NodeHandle &_nh, ros::NodeHandle &_nh_priv ) :
 	port( "" ),
-	ch1_joint_name( "1" ),
-	ch2_joint_name( "2" ),
+	ch1_joint_name( "D" ),
+	ch2_joint_name( "T" ),
 	fd( -1 ),
 	nh( _nh ),
 	nh_priv( _nh_priv ),
@@ -29,8 +29,8 @@ kangaroo::kangaroo( ros::NodeHandle &_nh, ros::NodeHandle &_nh_priv ) :
 {
 	ROS_INFO( "Initializing" );
 	nh_priv.param( "port", port, (std::string)"/dev/ttyUSB0" );
-	nh_priv.param( "ch1_joint_name", ch1_joint_name, (std::string)"1" );
-	nh_priv.param( "ch2_joint_name", ch2_joint_name, (std::string)"2" );
+	nh_priv.param( "ch1_joint_name", ch1_joint_name, (std::string)"D" );
+	nh_priv.param( "ch2_joint_name", ch2_joint_name, (std::string)"T" );
 
 	// the rate we want to set the timer at
 	double rate = (double)1/(double)hz;
@@ -193,15 +193,15 @@ void kangaroo::JointTrajCB(const trajectory_msgs::JointTrajectoryPtr &msg)
 
 	// lock the output_mutex
 	boost::mutex::scoped_lock output_lock(output_mutex);
-	set_channel_speed(channel_1_speed, 128, '1');
-	set_channel_speed(channel_2_speed, 128, '2');
+	set_channel_speed(channel_1_speed, 128, 'D');
+	set_channel_speed(channel_2_speed, 128, 'T');
 }
 
 bool kangaroo::send_start_signals(unsigned char address)
 {
 	// send the start signal to channel 1
 	unsigned char buffer[7];
-	int num_of_bytes_1 = write_kangaroo_start_command(address, '1', buffer);
+	int num_of_bytes_1 = write_kangaroo_start_command(address, ch1_joint_name, buffer);
 	if (0 > write(fd, buffer, num_of_bytes_1))
 	{
 		ROS_ERROR("Failed to update channel 1: %s", strerror(errno));
@@ -210,10 +210,35 @@ bool kangaroo::send_start_signals(unsigned char address)
 	}
 
 	// send the start signal to channel 2
-	int num_of_bytes_2 = write_kangaroo_start_command(address, '2', buffer);
+	int num_of_bytes_2 = write_kangaroo_start_command(address, ch2_joint_name, buffer);
 	if (0 > write(fd, buffer, num_of_bytes_2))
 	{
 		ROS_ERROR("Failed to update channel 2: %s", strerror(errno));
+		close();
+		return false;
+	}
+
+	return true;
+}
+
+
+bool kangaroo::send_power_down_signals(unsigned char address)
+{
+	// send the power_down signal to the drive channel 
+	unsigned char buffer[6];
+	int num_of_bytes_1 = power_down_all_command(address, ch1_joint_name, buffer);
+	if (0 > write(fd, buffer, num_of_bytes_1))
+	{
+		ROS_ERROR("Failed to power down drive channel: %s", strerror(errno));
+		close();
+		return false;
+	}
+
+	// send the power_down signal to turn channel 
+	int num_of_bytes_2 = power_down_all_command(address, ch2_joint_name, buffer);
+	if (0 > write(fd, buffer, num_of_bytes_2))
+	{
+		ROS_ERROR("Failed to power down turn channel: %s", strerror(errno));
 		close();
 		return false;
 	}
@@ -256,10 +281,10 @@ void kangaroo::JointStateCB( const ros::WallTimerEvent &e )
 
 		// get_position and get_velocity might throw an exception if either
 		//   request or the read fails
-		msg->position[0] = get_parameter((unsigned char)128, '1', (unsigned char)1);	// position for ch1
-		msg->velocity[0] = get_parameter((unsigned char)128, '1', (unsigned char)2);	// velocity for ch1
-		msg->position[1] = get_parameter((unsigned char)128, '2', (unsigned char)1);	// position for ch2
-		msg->velocity[1] = get_parameter((unsigned char)128, '2', (unsigned char)2);	// velocity for ch2
+		msg->position[0] = get_parameter((unsigned char)128, ch1_joint_name, (unsigned char)1);	// position for ch1
+		msg->velocity[0] = get_parameter((unsigned char)128, ch1_joint_name, (unsigned char)2);	// velocity for ch1
+		msg->position[1] = get_parameter((unsigned char)128, ch2_joint_name, (unsigned char)1);	// position for ch2
+		msg->velocity[1] = get_parameter((unsigned char)128, ch2_joint_name, (unsigned char)2);	// velocity for ch2
 
 		msg->position[0] = encoder_lines_to_radians(msg->position[0]);
 		msg->velocity[0] = encoder_lines_to_radians(msg->velocity[0]);
