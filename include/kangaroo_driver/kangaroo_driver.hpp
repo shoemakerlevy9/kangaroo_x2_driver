@@ -32,6 +32,7 @@ private:
 	bool send_get_request(unsigned char address, char channel, unsigned char desired_parameter);
 	bool set_channel_speed(double speed, unsigned char address, char channel);
 	bool send_start_signals(uint8_t address);
+	bool send_power_down_signals(unsigned char address)
 
 	// functions used for the request - response  (JointStateCB)
 	int get_parameter(unsigned char address, char channel, unsigned char desired_parameter);
