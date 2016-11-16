@@ -17,8 +17,8 @@
 
 kangaroo::kangaroo( ros::NodeHandle &_nh, ros::NodeHandle &_nh_priv ) :
 	port( "" ),
-	ch1_joint_name( "D" ),
-	ch2_joint_name( "T" ),
+	ch1_joint_name( "1" ),
+	ch2_joint_name( "2" ),
 	fd( -1 ),
 	nh( _nh ),
 	nh_priv( _nh_priv ),
@@ -29,8 +29,8 @@ kangaroo::kangaroo( ros::NodeHandle &_nh, ros::NodeHandle &_nh_priv ) :
 {
 	ROS_INFO( "Initializing" );
 	nh_priv.param( "port", port, (std::string)"/dev/ttyUSB0" );
-	nh_priv.param( "ch1_joint_name", ch1_joint_name, (std::string)"D" );
-	nh_priv.param( "ch2_joint_name", ch2_joint_name, (std::string)"T" );
+	nh_priv.param( "ch1_joint_name", ch1_joint_name, (std::string)"1" );
+	nh_priv.param( "ch2_joint_name", ch2_joint_name, (std::string)"2" );
 
 	// the rate we want to set the timer at
 	double rate = (double)1/(double)hz;
