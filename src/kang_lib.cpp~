@@ -159,7 +159,7 @@ size_t power_down_all_command(unsigned char address, char channel, unsigned char
     size_t length = 0;
 	data[length++] = (unsigned char)channel;
     data[length++] = 0;  // flags
-    data[length++] = 1;  // power down command number
+    data[length++] = 0;  // power down command number
 	return write_kangaroo_command(address, 37, data, length, buffer);
 }
 

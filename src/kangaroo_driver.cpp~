@@ -207,7 +207,7 @@ void kangaroo::PowerDownCB(const std_msgs::BoolPtr &msg)
 	if (msg->data)
 	{
         ROS_INFO("Powering down motors");
-		send_power_down_signals(128);
+		//send_power_down_signals(128);
 	}
 }
 

@@ -28,7 +28,7 @@ public:
 private:
 	bool is_open( ) const;
 	void JointTrajCB( const trajectory_msgs::JointTrajectoryPtr &msg );
-    void PowerDownCB( const std_msgs::BoolPtr &msg);
+    void PowerDownCB( const std_msgs::BoolPtr &msg)
 
 	// functions for sending information to the kangaroo
 	bool send_get_request(unsigned char address, char channel, unsigned char desired_parameter);
