@@ -462,7 +462,7 @@ int kangaroo::evaluate_kangaroo_response( unsigned char address, unsigned char* 
 	}
 
 	int value = un_bitpack_number(&data[value_offset], value_size);
-    ROS_ERROR("Error code: %i", value);
+   
 	//std::cout << "The value is: " << value << std::endl;
 	if( data[1] & 1 )	// testing the flag to see if there is an error
 	{

@@ -207,7 +207,7 @@ void kangaroo::PowerDownCB(const std_msgs::BoolPtr &msg)
 	if (msg->data)
 	{
         ROS_INFO("Powering down motors");
-		//send_power_down_signals(128);
+		send_power_down_signals(128);
 	}
 }
 
@@ -462,7 +462,7 @@ int kangaroo::evaluate_kangaroo_response( unsigned char address, unsigned char* 
 	}
 
 	int value = un_bitpack_number(&data[value_offset], value_size);
-    ROS_ERROR("Error code: %i", value);
+   
 	//std::cout << "The value is: " << value << std::endl;
 	if( data[1] & 1 )	// testing the flag to see if there is an error
 	{
